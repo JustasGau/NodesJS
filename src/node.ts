@@ -13,6 +13,10 @@ export class Node implements IDrawable {
         this.y = y;
     }
 
+    addSelectableOutline(): void {
+        this.addEventListener("click", e => this.drawAtMouse(e));
+    }
+
     draw(): void {
         this.context.beginPath();
         this.context.arc(
@@ -27,6 +31,10 @@ export class Node implements IDrawable {
         this.context.fillStyle = "#54251B"
 
         this.context.fill();
+    }
+
+    hit(x: number, y:number): boolean {
+
     }
 
 }

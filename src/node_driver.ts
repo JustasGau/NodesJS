@@ -1,10 +1,17 @@
 import {Node} from './node.js';
 
+enum STATES {
+    draw,
+    select,
+    drag
+}
 
 export class NodeDriver {
     context: CanvasRenderingContext2D;
     canvas: HTMLCanvasElement;
     nodes: Node[] = [];
+    selectedNode: Node | null = null; 
+
 
     constructor(context: CanvasRenderingContext2D, canvas: HTMLCanvasElement) {
         this.context = context;
@@ -23,8 +30,27 @@ export class NodeDriver {
         newNode.draw();
     }
 
+    HandleMouseDown(event: MouseEvent) :void {
+        const mouseX = event.clientX;
+        const mouseY = event.clientY;
+        for (let i = 0; i < this.nodes.length; i++) {
+            const cur_node = this.nodes[i];
+            if (cur_node.hit(mouseX, mouseY)) {
+                this.selectedNode = cur_node;
+                // start dragging
+                break;
+            }
+        }
+        // else if no object is hit then draw on empty space 
+        // or other logic
+    }
+
     initEventListeners(): void {
-        this.canvas.addEventListener("click", e => this.drawAtMouse(e));
+        this.canvas.addEventListener("mousedown", e => this.HandleMouseDown(e));
+        // this.canvas.addEventListener("mouseup", e => this.drawAtMouse(e));
+        // this.canvas.addEventListener("mouseover", e => this.drawAtMouse(e));
+        // this.canvas.addEventListener("mouseleave", e => this.drawAtMouse(e));
+
     }
 
     drawLoop(): void {
