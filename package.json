@@ -1,0 +1,29 @@
+{
+  "name": "nodesjs",
+  "version": "1.0.0",
+  "description": "A canvas based node drawing library",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JustasGau/NodesJS.git"
+  },
+  "keywords": [
+    "nodes",
+    "js",
+    "planner",
+    "progress"
+  ],
+  "author": "Justas Gaurylius",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JustasGau/NodesJS/issues"
+  },
+  "homepage": "https://github.com/JustasGau/NodesJS#readme",
+  "dependencies": {
+    "gts": "^3.1.0",
+    "typescript": "^4.7.3"
+  }
+}
