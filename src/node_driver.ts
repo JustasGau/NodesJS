@@ -11,7 +11,7 @@ export class NodeDriver {
     canvas: HTMLCanvasElement;
     nodes: Node[] = [];
     selectedNode: Node | null = null; 
-
+    scale: number = 1;
 
     constructor(context: CanvasRenderingContext2D, canvas: HTMLCanvasElement) {
         this.context = context;
@@ -25,9 +25,9 @@ export class NodeDriver {
     }
 
     drawAtMouse(event: MouseEvent): void {
-        const newNode = new Node(this.context, event.clientX, event.clientY);
+        const newNode = new Node(this.context, event.clientX / this.scale, event.clientY / this.scale);
         this.nodes.push(newNode);
-        newNode.draw();
+        newNode.draw(this.scale);
     }
 
     HandleMouseDown(event: MouseEvent) :void {
@@ -45,8 +45,17 @@ export class NodeDriver {
         // or other logic
     }
 
+    zoom(event: WheelEvent): void {
+        event.preventDefault();
+
+        this.scale += event.deltaY * -0.005;
+        this.scale = Math.min(Math.max(.125, this.scale), 4);
+        console.log(this.scale);
+    }
+
     initEventListeners(): void {
-        this.canvas.addEventListener("mousedown", e => this.HandleMouseDown(e));
+        this.canvas.addEventListener("mousedown", e => this.drawAtMouse(e));
+        this.canvas.addEventListener('wheel', e => this.zoom(e));
         // this.canvas.addEventListener("mouseup", e => this.drawAtMouse(e));
         // this.canvas.addEventListener("mouseover", e => this.drawAtMouse(e));
         // this.canvas.addEventListener("mouseleave", e => this.drawAtMouse(e));
@@ -58,7 +67,7 @@ export class NodeDriver {
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
     
         for (let i = 0; i < this.nodes.length; i++) {
-            this.nodes[i].draw();
+            this.nodes[i].draw(this.scale);
         }
         window.requestAnimationFrame(() => this.drawLoop());
     }

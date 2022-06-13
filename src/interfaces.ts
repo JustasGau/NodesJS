@@ -1,3 +1,3 @@
 export interface IDrawable {
-    draw(): void
+    draw(scale: number): void
   }

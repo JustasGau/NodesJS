@@ -13,16 +13,16 @@ export class Node implements IDrawable {
         this.y = y;
     }
 
-    addSelectableOutline(): void {
-        this.addEventListener("click", e => this.drawAtMouse(e));
-    }
+    // addSelectableOutline(): void {
+    //     this.addEventListener("click", e => this.drawAtMouse(e));
+    // }
 
-    draw(): void {
+    draw(scale: number): void {
         this.context.beginPath();
         this.context.arc(
-            this.x,
-            this.y,
-            this.radius,
+            this.x * scale,
+            this.y * scale,
+            this.radius * scale,
             0,
             Math.PI * 2,
             false
@@ -33,8 +33,8 @@ export class Node implements IDrawable {
         this.context.fill();
     }
 
-    hit(x: number, y:number): boolean {
-
+    hit(x: number, y: number): boolean {
+        return true;
     }
 
 }
