@@ -1,4 +1,5 @@
 import { IDrawable } from './interfaces';
+import { vec2 } from './types.js';
 
 // add cubes, circles, possible other shapes as nodes
 export class Node implements IDrawable {
@@ -17,11 +18,14 @@ export class Node implements IDrawable {
     //     this.addEventListener("click", e => this.drawAtMouse(e));
     // }
 
-    draw(scale: number): void {
+    draw(scale: number, pan :vec2): void {
+        const relativeX = this.x + pan.x;
+        const relativeY = this.y + pan.y;
+
         this.context.beginPath();
         this.context.arc(
-            this.x * scale,
-            this.y * scale,
+            relativeX * scale,
+            relativeY * scale,
             this.radius * scale,
             0,
             Math.PI * 2,

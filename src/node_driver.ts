@@ -1,14 +1,9 @@
 import { Node } from './node.js';
+import { vec2 } from './types.js';
 
 enum STATES {
     DRAW,
-    PAN,
-}
-
-// TODO move type definitions to seperate file
-type MouseStruct = {
-    x: number;
-    y: number;
+    CAMERA,
 }
 
 export class NodeDriver {
@@ -17,11 +12,12 @@ export class NodeDriver {
     nodes: Node[] = [];
     selectedNode: Node | null = null;
     scale: number = 1;
+    isDragging: boolean = false;
     currentState = STATES.DRAW;
-    pan: MouseStruct = {
-        x: 0,
-        y: 0
-    }
+    cameraOffset: vec2 = {x: 0, y: 0};
+    momentOffset: vec2 = {x: 0, y: 0};
+    dragStart: vec2 = {x: 0, y: 0};
+    dragEnd: vec2 = {x: 0, y: 0};
 
     constructor(context: CanvasRenderingContext2D, canvas: HTMLCanvasElement) {
         this.context = context;
@@ -34,24 +30,29 @@ export class NodeDriver {
         this.drawLoop();
     }
 
-    startPan(): void {
-
+    startPan(event: MouseEvent): void {
+        this.isDragging = true;
+        this.dragStart = { x: event.clientX, y: event.clientY }
     }
 
-    endPan(): void {
-        
+    endPan(event: MouseEvent): void {
+        this.isDragging = false;
     }
 
     atMouseDown(event: MouseEvent): void {
+        console.log("Mouse down")
         switch (this.currentState) {
             case STATES.DRAW:
-                const newNode = new Node(this.context, event.clientX / this.scale, event.clientY / this.scale);
+                const newNode = new Node(
+                    this.context,
+                    (event.clientX / this.scale - this.cameraOffset.x),
+                    (event.clientY / this.scale - this.cameraOffset.y) 
+                    );
                 this.nodes.push(newNode);
-                newNode.draw(this.scale);
+                newNode.draw(this.scale, this.cameraOffset);
                 break;
-            case STATES.PAN:
-                this.startPan();
-                console.log("Mouse down")
+            case STATES.CAMERA:
+                this.startPan(event);
 
             default:
                 break;
@@ -59,10 +60,29 @@ export class NodeDriver {
     }
 
     atMouseUp(event: MouseEvent): void {
+        console.log("Mouse up")
         switch (this.currentState) {
-            case STATES.PAN:
-                this.endPan();
-                console.log("Mouse up")
+            case STATES.CAMERA:
+                this.endPan(event);
+                console.log(this.cameraOffset)
+
+            default:
+                break;
+        }
+    }
+
+    atMouseMove(event: MouseEvent): void {
+        switch (this.currentState) {
+            case STATES.CAMERA:
+                if (!this.isDragging) return
+                const offset: vec2 = {
+                    x: event.clientX - this.dragStart.x,
+                    y: event.clientY - this.dragStart.y,
+                }
+                this.cameraOffset.x += offset.x;
+                this.cameraOffset.y += offset.y;
+                this.dragStart = { x: event.clientX, y: event.clientY }
+
 
             default:
                 break;
@@ -85,7 +105,6 @@ export class NodeDriver {
     //     // or other logic
     // }
 
-    // TODO improve zooming to use context instead of pure multiplication
     zoom(event: WheelEvent): void {
         event.preventDefault();
 
@@ -99,15 +118,18 @@ export class NodeDriver {
         console.log(`Key pressed ${name} \r\n Key code value: ${code}`);
         if (code === 'Enter') {
             if (this.currentState === STATES.DRAW) {
-                this.currentState = STATES.PAN
+                this.currentState = STATES.CAMERA
+            } else {
+                this.currentState = STATES.DRAW
             }
         }
     }
 
     initEventListeners(): void {
         this.canvas.addEventListener("mousedown", e => this.atMouseDown(e));
-        this.canvas.addEventListener('wheel', e => this.zoom(e));
+        this.canvas.addEventListener("wheel", e => this.zoom(e));
         this.canvas.addEventListener("mouseup", e => this.atMouseUp(e));
+        this.canvas.addEventListener("mousemove", e => this.atMouseMove(e));
         // this.canvas.addEventListener("mouseover", e => this.drawAtMouse(e));
         // this.canvas.addEventListener("mouseleave", e => this.drawAtMouse(e));
         addEventListener('keydown', e => this.tempSwitchStages(e));
@@ -119,7 +141,7 @@ export class NodeDriver {
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
         for (let i = 0; i < this.nodes.length; i++) {
-            this.nodes[i].draw(this.scale);
+            this.nodes[i].draw(this.scale, this.cameraOffset);
         }
         window.requestAnimationFrame(() => this.drawLoop());
     }

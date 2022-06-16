@@ -8,7 +8,6 @@
 ## TODO
 
 - more shape primitives
-- panning
 - design
 - node properties
 - workspaces, tabs
@@ -16,3 +15,5 @@
 - dragging
 - floating menus
 - side menu for various controls/debugging
+- serialization
+- zoom to cursor
