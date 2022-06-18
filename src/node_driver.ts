@@ -4,6 +4,7 @@ import { vec2 } from './types.js';
 enum STATES {
     DRAW,
     CAMERA,
+    EDIT,
 }
 
 export class NodeDriver {
@@ -53,7 +54,22 @@ export class NodeDriver {
                 break;
             case STATES.CAMERA:
                 this.startPan(event);
-
+                break;
+            case STATES.EDIT:
+                const mouseX = event.clientX;
+                const mouseY = event.clientY;
+                for (let i = 0; i < this.nodes.length; i++) {
+                    const cur_node = this.nodes[i];
+                    //  TODO hit detection with panning and zooming
+                    if (cur_node.hit(mouseX, mouseY)) {
+                        this.selectedNode = cur_node;
+                        // start dragging
+                        console.log("Hit node")
+                        break;
+                    }
+                }
+                // else if no object is hit then draw on empty space 
+                // or other logic
             default:
                 break;
         }
@@ -82,28 +98,19 @@ export class NodeDriver {
                 this.cameraOffset.x += offset.x;
                 this.cameraOffset.y += offset.y;
                 this.dragStart = { x: event.clientX, y: event.clientY }
+                break;
+            case STATES.DRAW:
 
-
+                break;
             default:
                 break;
         }
     }
 
     // TODO finish element dragging
-    // HandleMouseDown(event: MouseEvent): void {
-    //     const mouseX = event.clientX;
-    //     const mouseY = event.clientY;
-    //     for (let i = 0; i < this.nodes.length; i++) {
-    //         const cur_node = this.nodes[i];
-    //         if (cur_node.hit(mouseX, mouseY)) {
-    //             this.selectedNode = cur_node;
-    //             // start dragging
-    //             break;
-    //         }
-    //     }
-    //     // else if no object is hit then draw on empty space 
-    //     // or other logic
-    // }
+    HandleMouseDown(event: MouseEvent): void {
+       
+    }
 
     zoom(event: WheelEvent): void {
         event.preventDefault();
@@ -117,11 +124,7 @@ export class NodeDriver {
         const code = event.code;
         console.log(`Key pressed ${name} \r\n Key code value: ${code}`);
         if (code === 'Enter') {
-            if (this.currentState === STATES.DRAW) {
-                this.currentState = STATES.CAMERA
-            } else {
-                this.currentState = STATES.DRAW
-            }
+            this.currentState ++;
         }
     }
 

@@ -14,10 +14,6 @@ export class Node implements IDrawable {
         this.y = y;
     }
 
-    // addSelectableOutline(): void {
-    //     this.addEventListener("click", e => this.drawAtMouse(e));
-    // }
-
     draw(scale: number, pan :vec2): void {
         const relativeX = this.x + pan.x;
         const relativeY = this.y + pan.y;
@@ -38,7 +34,7 @@ export class Node implements IDrawable {
     }
 
     hit(x: number, y: number): boolean {
-        return true;
+        return Math.round(Math.sqrt(Math.pow(x - this.x, 2) + Math.pow(y - this.y, 2))) <= this.radius;
     }
 
 }
