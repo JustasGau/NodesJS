@@ -17,3 +17,6 @@
 - side menu for various controls/debugging
 - serialization
 - zoom to cursor
+- repeating tiled background
+- objects within other objects should have relative container coordinates
+- reorganize "menus" and  add buttons

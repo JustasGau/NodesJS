@@ -1,5 +1,8 @@
 import { Node } from './node.js';
+import { Menu } from './menu.js';
+import { Text } from './text.js';
 import { vec2 } from './types.js';
+import { IDrawable } from './interfaces.js';
 
 enum STATES {
     DRAW,
@@ -10,8 +13,8 @@ enum STATES {
 export class NodeDriver {
     context: CanvasRenderingContext2D;
     canvas: HTMLCanvasElement;
-    nodes: Node[] = [];
-    selectedNode: Node | null = null;
+    nodes: IDrawable[][] = [];
+    selectedNode: IDrawable | null = null;
     scale: number = 1;
     isDragging: boolean = false;
     currentState = STATES.DRAW;
@@ -19,10 +22,25 @@ export class NodeDriver {
     momentOffset: vec2 = {x: 0, y: 0};
     dragStart: vec2 = {x: 0, y: 0};
     dragEnd: vec2 = {x: 0, y: 0};
+    refs: { [val: string]: Text } = {};
 
     constructor(context: CanvasRenderingContext2D, canvas: HTMLCanvasElement) {
         this.context = context;
         this.canvas = canvas;
+        this.nodes[0] = [];
+        this.nodes[1] = [];
+        this.nodes[2] = [];
+        const newNode = new Menu(this.context, 10, 10, 150, 700);
+        this.addDrawableObject(newNode);
+        // newNode.addChild(new Menu(this.context, 10, 10, 20, 40));
+        const text = new Text(this.context, 10, 600, 'DRAW');
+        this.refs["text"] = text;
+        newNode.addChild(text);
+    }
+
+    addDrawableObject(node: IDrawable): void {
+        const z = node.getIndex();
+        this.nodes[z].push(node);
     }
 
     start(): void {
@@ -49,7 +67,7 @@ export class NodeDriver {
                     (event.clientX / this.scale - this.cameraOffset.x),
                     (event.clientY / this.scale - this.cameraOffset.y) 
                     );
-                this.nodes.push(newNode);
+                this.addDrawableObject(newNode);
                 newNode.draw(this.scale, this.cameraOffset);
                 break;
             case STATES.CAMERA:
@@ -59,13 +77,15 @@ export class NodeDriver {
                 const mouseX = event.clientX;
                 const mouseY = event.clientY;
                 for (let i = 0; i < this.nodes.length; i++) {
-                    const cur_node = this.nodes[i];
-                    //  TODO hit detection with panning and zooming
-                    if (cur_node.hit(mouseX, mouseY)) {
-                        this.selectedNode = cur_node;
-                        // start dragging
-                        console.log("Hit node")
-                        break;
+                    for (let j = 0; j < this.nodes[i].length; j++) {
+                        const cur_node = this.nodes[i][j];
+                        //  TODO hit detection with panning and zooming
+                        if (cur_node.hit(mouseX, mouseY)) {
+                            this.selectedNode = cur_node;
+                            // start dragging
+                            console.log("Hit node")
+                            break;
+                        }
                     }
                 }
                 // else if no object is hit then draw on empty space 
@@ -119,12 +139,27 @@ export class NodeDriver {
         this.scale = Math.min(Math.max(.125, this.scale), 4);
     }
 
+    setText():void {
+        const text = this.refs["text"];
+        if (STATES.CAMERA) text.setValue("CAMERA");
+        if (STATES.DRAW) text.setValue("DRAW");
+        if (STATES.EDIT) text.setValue("EDIT");
+    }
+
     tempSwitchStages(event: KeyboardEvent): void {
         const name = event.key;
         const code = event.code;
         console.log(`Key pressed ${name} \r\n Key code value: ${code}`);
         if (code === 'Enter') {
+            console.log(this.currentState);
+
             this.currentState ++;
+            console.log(this.currentState);
+
+            this.setText();
+            if (this.currentState == Object.keys(STATES).length / 2) {
+                this.currentState = 0;
+            }
         }
     }
 
@@ -142,9 +177,10 @@ export class NodeDriver {
     drawLoop(): void {
         this.context.fillStyle = '#283F3B';
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
         for (let i = 0; i < this.nodes.length; i++) {
-            this.nodes[i].draw(this.scale, this.cameraOffset);
+            for (let j = 0; j < this.nodes[i].length; j++) {
+                this.nodes[i][j].draw(this.scale, this.cameraOffset);
+            }
         }
         window.requestAnimationFrame(() => this.drawLoop());
     }
