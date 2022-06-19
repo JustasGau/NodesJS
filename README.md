@@ -18,5 +18,5 @@
 - serialization
 - zoom to cursor
 - repeating tiled background
-- objects within other objects should have relative container coordinates
-- reorganize "menus" and  add buttons
+- dynamic sizes that are limited to outer container
+- for now container objects should not have a complex "flex like" positions, but should be set in a vertical/horizontal grids

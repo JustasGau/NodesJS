@@ -1,4 +1,4 @@
-import { IDrawable } from './interfaces';
+import { IDrawable } from './interfaces.js';
 import { vec2 } from './types.js';
 
 // add cubes, circles, possible other shapes as nodes

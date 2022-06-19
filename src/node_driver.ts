@@ -1,6 +1,5 @@
 import { Node } from './node.js';
-import { Menu } from './menu.js';
-import { Text } from './text.js';
+import { GUI } from './windowing/win_main.js';
 import { vec2 } from './types.js';
 import { IDrawable } from './interfaces.js';
 
@@ -23,19 +22,18 @@ export class NodeDriver {
     dragStart: vec2 = {x: 0, y: 0};
     dragEnd: vec2 = {x: 0, y: 0};
     refs: { [val: string]: Text } = {};
+    windows: GUI;
 
     constructor(context: CanvasRenderingContext2D, canvas: HTMLCanvasElement) {
         this.context = context;
         this.canvas = canvas;
+        // TODO questionable
         this.nodes[0] = [];
         this.nodes[1] = [];
         this.nodes[2] = [];
-        const newNode = new Menu(this.context, 10, 10, 150, 700);
-        this.addDrawableObject(newNode);
-        // newNode.addChild(new Menu(this.context, 10, 10, 20, 40));
-        const text = new Text(this.context, 10, 600, 'DRAW');
-        this.refs["text"] = text;
-        newNode.addChild(text);
+
+        this.windows = new GUI(context);
+        this.windows.createWindow(10, 10);
     }
 
     addDrawableObject(node: IDrawable): void {
@@ -139,13 +137,6 @@ export class NodeDriver {
         this.scale = Math.min(Math.max(.125, this.scale), 4);
     }
 
-    setText():void {
-        const text = this.refs["text"];
-        if (STATES.CAMERA) text.setValue("CAMERA");
-        if (STATES.DRAW) text.setValue("DRAW");
-        if (STATES.EDIT) text.setValue("EDIT");
-    }
-
     tempSwitchStages(event: KeyboardEvent): void {
         const name = event.key;
         const code = event.code;
@@ -156,7 +147,6 @@ export class NodeDriver {
             this.currentState ++;
             console.log(this.currentState);
 
-            this.setText();
             if (this.currentState == Object.keys(STATES).length / 2) {
                 this.currentState = 0;
             }
@@ -182,6 +172,7 @@ export class NodeDriver {
                 this.nodes[i][j].draw(this.scale, this.cameraOffset);
             }
         }
+        this.windows.draw();
         window.requestAnimationFrame(() => this.drawLoop());
     }
 }
