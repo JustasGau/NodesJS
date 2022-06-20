@@ -9,8 +9,9 @@ export interface IObject {
     getY(): number;
     // for grid like structures, so a parent container can calculate follwong children positions
     getHeight(): number;
-    // might be needed
-    // getWidth(): number;
+    getWidth(): number;
+    setHeight(value: number): boolean;
+    setWidth(value: number): boolean;
     getContext(): CanvasRenderingContext2D;
 
 }

@@ -6,6 +6,10 @@ export interface IWindow extends IObject{
     scalable: boolean;
     closable: boolean;
 
-    addContainer(container: IContainer): void;
+    // gridSpace is the percentage of parent container the child can occupy 
+    // e.g. cont1 - 20%; cont2 - 80%
+    // TODO one container should not occupy 100% space if there are other containers
+    addContainer(container: IContainer, gridSpace: number): void;
     testHit(x: number, y: number): boolean;
+    recalculateObjects(): void;
 }

@@ -165,7 +165,7 @@ export class NodeDriver {
     }
 
     drawLoop(): void {
-        this.context.fillStyle = '#283F3B';
+        this.context.fillStyle = '#A6D9F7';
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
         for (let i = 0; i < this.nodes.length; i++) {
             for (let j = 0; j < this.nodes[i].length; j++) {

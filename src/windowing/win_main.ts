@@ -4,7 +4,10 @@ import { IDropdown } from "./win_interfaces/IDropdown";
 import { IList } from "./win_interfaces/IList";
 import { IText } from "./win_interfaces/IText";
 import { IWindow } from "./win_interfaces/IWindow";
+
+import { GUIContainer } from "./win_container.js";
 import { GUIWindow } from "./win_window.js";
+import { GRID } from "./win_types.js"
 
 export class GUI {
     context: CanvasRenderingContext2D;
@@ -36,7 +39,7 @@ export class GUI {
     }
 
     createContainer(): IContainer{
-        throw new Error("Not implemented")
+        return new GUIContainer(this.context);
     }
 
     createDropdown(): IDropdown{
